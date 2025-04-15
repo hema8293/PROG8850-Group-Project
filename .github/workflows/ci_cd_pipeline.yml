@@ -8,16 +8,28 @@ on:
 jobs:
   deploy-mysql:
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: Root@1234
+          MYSQL_DATABASE: project_db
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping --silent" --health-interval=10s --health-timeout=5s --health-retries=5
 
     steps:
     - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: Install MySQL Client
-      run: sudo apt-get update && sudo apt-get install -y mysql-client python3 python3-pip
+    - name: Install Python and Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y python3 python3-pip
+        pip3 install mysql-connector-python
 
-    - name: Install MySQL Python Library
-      run: pip3 install mysql-connector-python
+    - name: Wait for MySQL to be ready
+      run: sleep 30
 
     - name: Run SQL Scripts
       run: |
