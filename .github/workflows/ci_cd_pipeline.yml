@@ -1,0 +1,29 @@
+name: CI/CD Pipeline for MySQL DB
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-mysql:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install MySQL Client
+      run: sudo apt-get update && sudo apt-get install -y mysql-client python3 python3-pip
+
+    - name: Install MySQL Python Library
+      run: pip3 install mysql-connector-python
+
+    - name: Run SQL Scripts
+      run: |
+        mysql -h 127.0.0.1 -u root -pRoot@1234 -e "SOURCE sql/create_table.sql;"
+        mysql -h 127.0.0.1 -u root -pRoot@1234 -e "SOURCE sql/add_column.sql;"
+        mysql -h 127.0.0.1 -u root -pRoot@1234 -e "SOURCE sql/insert_data.sql;"
+
+    - name: Run Python Script for Multi Thread Queries
+      run: python3 scripts/multi_thread_queries.py
