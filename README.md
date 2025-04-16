@@ -1,170 +1,193 @@
 
-# PROG8850 Group Project – Signoz Monitoring for MySQL Logs
+# 📘 PROG8850 Group Project – Signoz Monitoring & MySQL Logs Visualization
 
-## 📌 Project Overview
+## 🧠 Project Objective
 
-This project involves setting up a real-time monitoring stack using **Signoz**, **Clickhouse**, and **OpenTelemetry Collector**. The stack collects logs (simulated MySQL logs), sends them to a telemetry pipeline, and visualizes them in the Signoz dashboard with alerting and external access via ngrok.
+This group project aims to monitor and analyze MySQL database activity using a fully containerized stack consisting of **Signoz**, **Clickhouse**, and **OpenTelemetry Collector**. The pipeline collects MySQL logs, sends them to Clickhouse, and displays visualizations and alerts on Signoz dashboards.
 
----
-
-## 🧰 Software/Tools Used
-
-| Tool/Software         | Purpose                                             |
-|----------------------|-----------------------------------------------------|
-| Docker               | Containerization of all components                  |
-| Docker Compose       | Define and manage multi-container apps             |
-| Signoz               | Observability tool to visualize logs/metrics        |
-| Clickhouse           | Backend columnar DB for telemetry data              |
-| OpenTelemetry Coll.  | Collector for processing and exporting logs         |
-| ngrok                | Expose local Signoz server to public                |
-| Simulated MySQL Logs | To demonstrate monitoring setup                     |
-| CMD/Terminal         | To run all setup and docker commands                |
+This README explains everything done so far and outlines what remains to be done. It also divides responsibilities clearly.
 
 ---
 
-## 🧩 Architecture Flow
+## ✅ Work Completed by Hema Priya (Me)
 
-1. Simulated MySQL logs are generated.
-2. OpenTelemetry Collector reads and processes the logs.
-3. The logs are exported to Clickhouse.
-4. Signoz queries Clickhouse to display logs in its UI.
-5. The Signoz dashboard is exposed to the web via **ngrok**.
+### ✔️ 1. Project Setup & Folder Structure
 
----
+- Created local folder: `PROG8850-Group-Project`
+- Created subfolders: `sql/`, `scripts/`, `.github/workflows/`
+- Created and edited files using command prompt:
+  - `sql/create_table.sql`, `add_column.sql`, `insert_data.sql`
+  - `scripts/multi_thread_queries.py`
+  - `.github/workflows/ci_cd_pipeline.yml`
 
-## 📁 Project Structure
+### ✔️ 2. GitHub Repository Setup
 
-```
-PROG8850-Group-Project/
-├── docker-compose.yaml
-├── otel-collector-config.yaml
-├── screenshots/
-│   ├── all-screenshots.png
-├── README.md
-└── group-report.pdf
-```
+- Initialized local git repository
+- Linked to GitHub: https://github.com/hema8293/PROG8850-Group-Project.git
+- Committed and pushed all files
 
----
+### ✔️ 3. CI/CD GitHub Actions Pipeline
 
-## ⚙️ Setup Instructions
+- Created and committed working `ci_cd_pipeline.yml` file
+- Ran pipeline: deployed MySQL schema + executed Python script ✅
+- Debugged errors: MySQL socket, Python name errors, thread issues
 
-### ✅ Step 1: Clone the repository
+### ✔️ 4. Docker & Signoz Setup
+
+- Installed Docker Desktop (Windows)
+- Cloned Signoz deployment repo
+- Pulled all required images
+- Resolved port conflicts (8080) and started containers with:
 
 ```bash
-git clone https://github.com/yourusername/PROG8850-Group-Project.git
-cd PROG8850-Group-Project
-```
-
-### ✅ Step 2: Create Configuration File
-
-Create `otel-collector-config.yaml` with:
-
-```yaml
-receivers:
-  otlp:
-    protocols:
-      grpc:
-      http:
-
-exporters:
-  clickhouse:
-    endpoint: tcp://clickhouse:9000
-    database: signoz_traces
-    username: default
-    password: ""
-    tls:
-      insecure: true
-
-processors:
-  batch:
-
-service:
-  pipelines:
-    traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [clickhouse]
-```
-
-### ✅ Step 3: Run Docker Compose
-
-```bash
-docker-compose down --volumes --remove-orphans
+docker-compose down
 docker-compose up -d
 ```
 
-Check all services using:
+- Verified containers: `signoz`, `clickhouse`, `otel-collector`, `query-service`, etc.
 
-```bash
-docker ps
-```
+### ✔️ 5. ngrok Setup
 
----
-
-## 🔍 Access Signoz
-
-- Default UI: [http://localhost:3301](http://localhost:3301)
-- With ngrok:
+- Logged into ngrok, started tunnel:
 
 ```bash
 ngrok http 3301
 ```
 
-Copy the public ngrok link to access Signoz from outside.
+- Shared ngrok URL to access Signoz from browser
+
+### ✔️ 6. Debugging Signoz Errors
+
+- Investigated and fixed:
+  - Clickhouse TCP port not binding (9000 conflict)
+  - otel-collector startup config errors
+  - signoz-query-service crashing due to SQLite lock
 
 ---
 
-## 📦 Simulate Logs
+## 🚧 Work Remaining (Can Be Split Among Group Members)
 
-You can simulate logs from your terminal or Python script.
+### 🧑‍💻 Member 2 – Log Simulation
+
+- Simulate logs from MySQL using a script or CLI command
+- Inject logs like:
 
 ```bash
-echo "ERROR: DB query timeout at 2025-04-16 15:00:01" >> /tmp/mysql.log
+echo "ERROR: MySQL timeout" >> /tmp/mysql.log
 ```
 
-Use OpenTelemetry to collect and forward them into Signoz.
+- Verify they appear in Signoz logs tab
+
+### 📊 Member 3 – Create Dashboards in Signoz
+
+- Access Signoz using ngrok link or `localhost:3301`
+- Create a new dashboard with at least 3 widgets:
+  - Error log trend (line chart)
+  - Count of errors by time (bar chart)
+  - Table of log messages
+
+### 🚨 Member 4 – Setup Alerting in Signoz
+
+- Navigate to **Alerts > Create Alert**
+- Condition: Log count > 3 with keyword "ERROR"
+- Add alert name, severity, and dummy notification rule
+- Capture screenshots
+
+### 📸 All Members – Final Screenshots
+
+- Dashboard view
+- Alerts page with triggered alerts
+- Container view in Docker
+- GitHub Actions run success
+- ngrok URL exposed and accessible
 
 ---
 
-## 📊 Dashboard and Alerts
+## 🧪 Testing & Verification
 
-1. Access the Signoz UI.
-2. Navigate to **Dashboards** > Create a new panel.
-3. Add 2–3 widgets (e.g., error count, log trend).
-4. Go to **Alerts**, and set a rule for error keyword.
-
----
-
-## ✅ Task Completion
-
-- [x] All containers deployed via Docker
-- [x] Configuration for telemetry pipeline
-- [x] Logs collected and visualized in Signoz
-- [x] Dashboard created with 3 visualizations
-- [x] Alert set for "ERROR" logs
-- [x] External access via ngrok working
+- CI/CD pipeline: ✅ Passed
+- Docker containers: ✅ Running successfully
+- Signoz: ⚠️ Some services restarted—requires log retry
+- ngrok: ✅ Active and accessible
 
 ---
 
-## 👥 Group Members
+## 🧩 Technologies Used
 
-- Hema Priya – Container Setup, Collector Config
-- Member 2 – Log Simulation & Alert Setup
-- Member 3 – Dashboard Panels & Report
-- Member 4 – Screenshots & Submission
-
----
-
-## 📄 Submission Checklist
-
-- ✅ `docker-compose.yaml`
-- ✅ `otel-collector-config.yaml`
-- ✅ Screenshots of Dashboard + Alerts + Logs
-- ✅ PDF Report (`group-report.pdf`)
-- ✅ `README.md`
+| Tool/Software         | Purpose                                 |
+|----------------------|------------------------------------------|
+| Docker               | Containerized the stack                  |
+| Docker Compose       | Manage multi-container Signoz services   |
+| GitHub Actions       | CI/CD pipeline for DB + Python scripts   |
+| MySQL                | Simulated database                       |
+| Signoz               | Observability dashboard                  |
+| Clickhouse           | Store telemetry/log data                 |
+| Python               | Multithreaded query simulator            |
+| ngrok                | Public access to localhost dashboard     |
 
 ---
 
-## 🏁 Conclusion
+## 📂 Project Structure
 
-This project helped us learn real-time monitoring, telemetry pipelines, containerization, and alerting using open-source tools. It simulates real industry DevOps use cases using Signoz and Docker.
+```
+PROG8850-Group-Project/
+├── sql/
+│   ├── create_table.sql
+│   ├── insert_data.sql
+│   └── add_column.sql
+├── scripts/
+│   └── multi_thread_queries.py
+├── .github/workflows/
+│   └── ci_cd_pipeline.yml
+├── docker-compose.yaml
+├── otel-collector-config.yaml
+├── screenshots/
+│   ├── dashboard.png
+│   ├── alerts.png
+│   ├── logs.png
+│   └── github-success.png
+└── README.md
+```
+
+---
+
+## 📅 Estimated Time Remaining
+
+| Task                  | Est. Time |
+|-----------------------|-----------|
+| Simulate MySQL Logs   | 15 mins   |
+| Create Dashboards     | 30 mins   |
+| Configure Alerts      | 20 mins   |
+| Screenshots + PDF     | 30 mins   |
+| ZIP and Submit        | 10 mins   |
+| **Total**             | **~1.5 hr** |
+
+---
+
+## 👩‍💻 Group Members & Roles
+
+| Member Name     | Role / Work Area                        |
+|------------------|------------------------------------------|
+| Hema Priya       | Docker, GitHub, Pipeline, Troubleshooting |
+| Member 2         | Log Simulation, Test MySQL errors        |
+| Member 3         | Dashboard in Signoz                      |
+| Member 4         | Alerts, Screenshot compilation           |
+
+---
+
+## ✅ Submission Checklist
+
+- [x] Functional CI/CD Pipeline
+- [x] Dockerized Signoz stack
+- [x] ngrok tunnel live
+- [ ] Logs simulated and visible in UI
+- [ ] Dashboard with widgets created
+- [ ] Alert configured for log trigger
+- [ ] All screenshots ready
+- [ ] Final PDF and ZIP created
+
+---
+
+## 📌 Final Note
+
+This project brings together Docker, observability, automation pipelines, and real-time log monitoring — giving us hands-on skills highly valued in DevOps and SRE roles.
