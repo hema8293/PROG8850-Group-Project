@@ -151,18 +151,7 @@ PROG8850-Group-Project/
 
 ---
 
-## 📅 Estimated Time Remaining
 
-| Task                  | Est. Time |
-|-----------------------|-----------|
-| Simulate MySQL Logs   | 15 mins   |
-| Create Dashboards     | 30 mins   |
-| Configure Alerts      | 20 mins   |
-| Screenshots + PDF     | 30 mins   |
-| ZIP and Submit        | 10 mins   |
-| **Total**             | **~1.5 hr** |
-
----
 
 ## 👩‍💻 Group Members & Roles
 
