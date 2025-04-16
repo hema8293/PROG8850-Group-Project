@@ -39,3 +39,12 @@ jobs:
 
     - name: Run Python Script for Multi Thread Queries
       run: python3 scripts/multi_thread_queries.py
+
+    - name: Validate Table and Data
+      run: |
+        echo "✅ Showing ClimateData Table Structure:"
+        mysql -h 127.0.0.1 -u root -pRoot@1234 -e "USE project_db; DESCRIBE ClimateData;"
+    
+        echo "✅ Checking Inserted Records:"
+        mysql -h 127.0.0.1 -u root -pRoot@1234 -e "USE project_db; SELECT COUNT(*) FROM ClimateData;"
+
